@@ -19,7 +19,7 @@ A landing page with a list of available shops:
  . account owners can:
  
     - create shops to be added as part of listed shops
-    - edit and update shop information
+    - make an order for a shop to sew their dress by providing their measurements
     
  . each shop must be approved by admin before listed as part of approved shops
 
@@ -39,12 +39,12 @@ SECRET_KEY, POSTGRES-credentials
   docker-compose build
   ```
   
-4. Run the application in containers from the specified .yml file,
+4. Run the application in containers from the docker-compose file,
  ```
   docker-compose up
 ```
 
-5. To run django management commands: run the command:
+5. To run django management commandsin the shell:
 ```
 docker exec -it tailor_container /bin/bash/
 ```
