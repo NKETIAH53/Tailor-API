@@ -22,3 +22,29 @@ A landing page with a list of available shops:
     - edit and update shop information
     
  . each shop must be approved by admin before listed as part of approved shops
+
+### To run program:
+Make sure you have Docker and docker-compose plugin installed on your machine.
+
+1. Clone the repository:
+```
+  git clone <repository url>
+```
+2. Create a .env file in the project root directory and define:
+```
+SECRET_KEY, POSTGRES-credentials
+```
+3. Build the tailor app image from the Dockerfile and install dependencies, run the command;
+  ```
+  docker-compose build
+  ```
+  
+4. Run the application in containers from the specified .yml file,
+ ```
+  docker-compose up
+```
+
+5. To run django management commands: run the command:
+```
+docker exec -it tailor_container /bin/bash/
+```
