@@ -1,17 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-
-
-User = settings.AUTH_USER_MODEL
+from django.contrib.auth.models import User
 
 
 class Design(models.Model):
     name = models.CharField(
         max_length=255,
         unique=True,
-        null=False,
-        blank=False,
         verbose_name=_("design style"),
     )
     description = models.TextField(
@@ -37,16 +32,13 @@ class Store(models.Model):
         
     store_owner = models.ForeignKey(
         User, 
-        on_delete=models.SET_NULL, 
-        default=1, 
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,  
         related_name='stores'
     )
     design = models.ManyToManyField(
         Design,
-        through='DesignDetail',
-        related_name='store_designs'
+        null=True,
+        through='DesignDetail'
     )
     store_name = models.CharField(
         max_length=150,
@@ -144,7 +136,7 @@ class Branch(models.Model):
         on_delete=models.CASCADE, 
         related_name='store_branch'
     )
-    name = models.CharField(
+    branch_name = models.CharField(
         max_length=200,
         blank=False,
         null=False,
@@ -163,4 +155,4 @@ class Branch(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.branch_name
