@@ -26,3 +26,4 @@ class StoreDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [StoreOwnerWritePermissions]
     queryset = Store.storeobjects.all()
     serializer_class = StoreSerializer
+    lookup_field = 'pk'
