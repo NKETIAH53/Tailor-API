@@ -1,10 +1,9 @@
 from .models import Store
 from .serializers import StoreSerializer
 from rest_framework import generics, permissions
-from rest_framework.permissions import BasePermission 
 
 
-class StoreOwnerWritePermissions(BasePermission):
+class StoreOwnerWritePermissions(permissions.BasePermission):
     # Custom user permission to give authenticated user 'Write -Permissions
     message = 'Only store owners can edit store information'
 
@@ -15,6 +14,7 @@ class StoreOwnerWritePermissions(BasePermission):
 
 
 class StoreList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Store.storeobjects.all()
     serializer_class = StoreSerializer
     
@@ -23,7 +23,7 @@ class StoreList(generics.ListCreateAPIView):
     
 
 class StoreDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [StoreOwnerWritePermissions]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, StoreOwnerWritePermissions]
     queryset = Store.storeobjects.all()
     serializer_class = StoreSerializer
     lookup_field = 'pk'
