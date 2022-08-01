@@ -46,5 +46,9 @@ SECRET_KEY, POSTGRES-credentials
 
 5. To run django management commandsin the shell:
 ```
-docker exec -it tailor_container /bin/bash/
+ docker exec -it tailor_container /bin/bash/
+```
+6. To run tests:
+```
+ coverage run  manage.py test
 ```
