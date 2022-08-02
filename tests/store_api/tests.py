@@ -7,18 +7,25 @@ from store_api.models import Store
 
 User = get_user_model()
 
-
 class StoreTests(APITestCase):
     
     def test_view_stores_list(self):
+
+        # test_store_data = {
+        #     'store_owner': 'a',
+        #     'store_name':'Grandpa',
+        #     'email': 'a@a.com',
+        #     'about': 'This is a test store.'
+        # }
 
         url = reverse('store_api:listcreate')
         response = self.client.get(url, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
 
 
-    def test_create_store_by_unauthenticated_user(self):
+    def test_create_store_by_unauthorized_user(self):
         
         data = {
             'store_owner': 1,
@@ -30,44 +37,42 @@ class StoreTests(APITestCase):
         url = reverse('store_api:listcreate')
         response = self.client.post(url, data, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-    def test_create_and_detail_store_view_by_authenticated_user(self):
+    def test_create_store_and_detail_store_view_by_authenticated_user(self):
 
-        client = APIClient()
-
-        store_owner = User.objects.create_user(
+        test_user = User.objects.create_user(
             first_name='kojo',
             last_name='asante',
             email='a@a.com',
             username='emma', 
             password='emma1234'
         )
+
+        url = reverse('store_api:listcreate')
         
-        client.login(
+        self.client.force_login(
             email='a@a.com', 
             password='emma1234'
         )
 
-        url = reverse('store_api:listcreate')
-
         data = {
-            # 'store_owner': 'a',
+            'store_owner': 'emma',
             'store_name':'Grandpa',
             'email': 'a@a.com',
             'about': 'This is a test store.'
         }
         
-        print(url)
-        response = client.post(url, data, format='json')
+        response = self.client.post(url, data, format='json')
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # View store details
         detail_url = reverse(('store_api:detailcreate'), kwargs={'pk':1})
-        response = self.client.get(detail_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(detail_url, data, format='json')
+        self.assertEqual(len(response.data), 1)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
     # def test_store_detail_update(self):

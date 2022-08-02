@@ -1,9 +1,6 @@
 # build the docker image with this command
 docker-compose build
 
-# spin a new project with this command
-docker-compose run --rm tailor django-admin startproject main .
-
 #start the services defined in the .yml file in their containers
 docker-compose up
 

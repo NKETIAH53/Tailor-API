@@ -1,20 +1,21 @@
+from rest_framework import generics
+from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly, SAFE_METHODS
+# from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Store
 from .serializers import StoreSerializer
-from rest_framework import generics, permissions
 
 
-class StoreOwnerWritePermissions(permissions.BasePermission):
-    # Custom user permission to give authenticated user 'Write -Permissions
+class StoreOwnerWritePermissions(BasePermission):
     message = 'Only store owners can edit store information'
 
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
+        if request.method in SAFE_METHODS:
             return True
         return obj.store_owner == request.user
 
 
 class StoreList(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Store.storeobjects.all()
     serializer_class = StoreSerializer
     
@@ -23,7 +24,7 @@ class StoreList(generics.ListCreateAPIView):
     
 
 class StoreDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, StoreOwnerWritePermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly, StoreOwnerWritePermissions]
     queryset = Store.storeobjects.all()
     serializer_class = StoreSerializer
     lookup_field = 'pk'

@@ -1,6 +1,7 @@
 import environ
 import os
 from pathlib import Path
+from datetime import timedelta
 
 #HANDING ENVIRONMENT VARIABLES
 env = environ.Env(
@@ -32,9 +33,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'store_api',
     'rest_framework',
-    'accounts.users'
+    'rest_framework_simplejwt',
+    'djoser',
+    'accounts.users',
+    'store_api',
+    
 ]
 
 MIDDLEWARE = [
@@ -104,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -116,21 +119,68 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-
 STATIC_URL = 'static/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media')
 MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-#HANDLING GLOBAL PRIVILEGES
+# EMAIL BACKEND CONFIGURATION
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD'  )
+EMAIL_PORT = env('EMAIL_PORT')
+DEFAULT_FROM_EMAIL = 'info@tailor.com'
+DOMAIN = env('DOMAIN')
+SITE_NAME = 'Tailor'
+
+#HANDLING GLOBAL PRIVILEGES AND AUTHENTICATION
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ]
+}
+
+
+SIMPLE_JWT={
+    'AUTH_HEADER_TYPES':(
+        # ('Bearer',),
+        'JWT',
+    ),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'SIGNING_KEY': env('SIGNING_KEY'),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {
+        'user_create': 'accounts.users.serializers.CreateUserSerializer',
+        'user': 'accounts.users.serializers.UserSerializer',
+        'current_user': 'accounts.users.serializers.CurrentUserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+
+    }
 }
