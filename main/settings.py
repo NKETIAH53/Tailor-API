@@ -2,6 +2,10 @@ import environ
 import os
 from pathlib import Path
 from datetime import timedelta
+import logging
+import logging.config
+from django.utils.log import DEFAULT_LOGGING
+
 
 #HANDING ENVIRONMENT VARIABLES
 env = environ.Env(
@@ -37,7 +41,10 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'djoser',
     'accounts.users',
+    'accounts.profiles',
+    'accounts.common',
     'store_api',
+    'django_countries',
     
 ]
 
@@ -110,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'GMT'
 
 USE_I18N = True
 
@@ -123,11 +130,13 @@ STATIC_URL = 'static/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media')
 MEDIA_URL = '/media/'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
 
 # EMAIL BACKEND CONFIGURATION
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -139,6 +148,7 @@ EMAIL_PORT = env('EMAIL_PORT')
 DEFAULT_FROM_EMAIL = 'info@tailor.com'
 DOMAIN = env('DOMAIN')
 SITE_NAME = 'Tailor'
+
 
 #HANDLING GLOBAL PRIVILEGES AND AUTHENTICATION
 REST_FRAMEWORK = {
@@ -179,8 +189,44 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'accounts.users.serializers.CreateUserSerializer',
         'user': 'accounts.users.serializers.UserSerializer',
-        'current_user': 'accounts.users.serializers.CurrentUserSerializer',
+        'current_user': 'accounts.users.serializers.UserSerializer',
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
-
     }
 }
+
+#HANDLING LOGGING
+logger = logging.getLogger(__name__)
+
+LOG_LEVEL = "INFO"
+
+logging.config.dictConfig(
+    {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "console": {
+                "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+            },
+            "file": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"},
+            "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "console",
+            },
+            "file": {
+                "level": "INFO",
+                "class": "logging.FileHandler",
+                "formatter": "file",
+                "filename": "logs/tailor.log",
+            },
+            "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
+        },
+        "loggers": {
+            "": {"level": "INFO", "handlers": ["console", "file"], "propagate": False},
+            "apps": {"level": "INFO", "handlers": ["console"], "propagate": False},
+            "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
+        },
+    }
+)

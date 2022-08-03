@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/auth/', include('djoser.urls.jwt')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
 # EXTRA ADMIN CONFIGURATION
 admin.site.site_header = 'Store Admin'
 admin.site.site_title = 'Store Admin Portal'

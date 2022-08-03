@@ -5,8 +5,9 @@
 __pycache__
 db.sqlite3
 media
-.coverage
+.coverage*
 htmlcov/
+media/
 
 # Python # 
 *.py[cod] 

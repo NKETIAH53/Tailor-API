@@ -10,3 +10,4 @@ coverage==6.4.2
 djoser
 djangorestframework-simplejwt
 pyjwt
+django-countries==7.3.2
