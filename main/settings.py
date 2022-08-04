@@ -163,10 +163,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT={
-    'AUTH_HEADER_TYPES':(
-        # ('Bearer',),
-        'JWT',
-    ),
+    'AUTH_HEADER_TYPES':('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'SIGNING_KEY': env('SIGNING_KEY'),
@@ -193,6 +190,7 @@ DJOSER = {
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
     }
 }
+
 
 #HANDLING LOGGING
 logger = logging.getLogger(__name__)

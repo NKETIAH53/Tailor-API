@@ -37,6 +37,11 @@ class Profile(TimeStampedUUIDModel):
         choices=Gender.choices,
         max_length=20,
     )
+    store_owner = models.BooleanField(
+        verbose_name='Store Owner',
+        default=False,
+        help_text='Are you a Store Owner?',
+    )
 
     def __str__(self):
         return f"{self.user.username}'s Profile"

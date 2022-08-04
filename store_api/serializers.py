@@ -13,6 +13,7 @@ class DesignDetailSerializer(serializers.ModelSerializer):
         model = DesignDetail
         fields = ('design', 'cost')
 
+
 class StoreSerializer(serializers.ModelSerializer):
     design = DesignSerializer(read_only=True, many=True)
     store_owner = serializers.SerializerMethodField()
@@ -26,6 +27,7 @@ class StoreSerializer(serializers.ModelSerializer):
             'about',
             'design',
         ]
+
     def get_store_owner(self, obj):
         return obj.store_owner.username
  

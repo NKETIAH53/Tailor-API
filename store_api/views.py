@@ -1,6 +1,5 @@
 from rest_framework import generics
 from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly, SAFE_METHODS
-# from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Store
 from .serializers import StoreSerializer
 
