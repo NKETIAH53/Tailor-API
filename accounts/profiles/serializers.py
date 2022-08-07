@@ -32,7 +32,7 @@ class MeasurementSerializer(serializers.ModelSerializer):
             'waist',
             'hips', 
             'waist_to_above_knee',
-            'aist_to_below_knee', 
+            'waist_to_below_knee', 
             'calf',
         ]
 

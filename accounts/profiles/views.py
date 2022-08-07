@@ -44,6 +44,8 @@ class GetProfileAPIView(APIView):
         serializer = ProfileSerializer(user_profile, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # def post(): #creating a new user profile
+
 
 class UpdateProfileAPIView(APIView):
     '''

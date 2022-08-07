@@ -40,8 +40,8 @@ class Store(models.Model):
     )
     design = models.ManyToManyField(
         Design,
-        null=True,
-        through='DesignDetail'
+        through='DesignDetail',
+        blank=True
     )
     store_name = models.CharField(
         max_length=150,
@@ -99,7 +99,8 @@ class DesignDetail(models.Model):
     )
     
     def __str__(self):
-        return self.design.name
+        return f'{self.cost}GHC'
+
 
 class Media(models.Model):
     design_detail = models.ForeignKey(

@@ -90,7 +90,8 @@ class Address(models.Model):
 class Measurement(models.Model):
     profile = models.OneToOneField(
         Profile,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='user_measurements'
     )
     neck = models.IntegerField(
         verbose_name='Around neck',

@@ -8,9 +8,12 @@ class StoreOwnerWritePermissions(BasePermission):
     message = 'Only store owners can edit store information'
 
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
+        
+        if request.method in SAFE_METHODS and obj.store_owner==request.user:
             return True
-        return obj.store_owner == request.user
+
+        elif request.method=='GET' and obj.store_owner!=request.user:
+            return True
 
 
 class StoreList(generics.ListCreateAPIView):
@@ -26,4 +29,3 @@ class StoreDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly, StoreOwnerWritePermissions]
     queryset = Store.storeobjects.all()
     serializer_class = StoreSerializer
-    lookup_field = 'pk'
