@@ -6,7 +6,4 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 
-# RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev \
-# pip-compile requirements.in && pip-sync requirements.txt
-
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && pip install --upgrade pip
