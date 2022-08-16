@@ -1,11 +1,21 @@
 from django.urls import path
-from .views import StoreOwnersListAPIView, GetProfileAPIView, UpdateProfileAPIView
+from .views import StoreOwnersListAPIView, RetrieveUpdateProfileAPIView
+
+# ,GetProfileAPIView
+#  UpdateProfileAPIView
 
 
-app_name = 'profiles'
+app_name = "profiles"
 
 urlpatterns = [
-    path('me/', GetProfileAPIView.as_view(), name='view_profile'),
-    path('update/<str:username>/', UpdateProfileAPIView.as_view(), name='update_profile'),
-    path('store_owners/all/', StoreOwnersListAPIView.as_view(), name='store_owners_profile')
+    path("me/", RetrieveUpdateProfileAPIView.as_view(), name="view_update_profile"),
+    # path("me/", GetProfileAPIView.as_view(), name="view_profile"),
+    # path(
+    #     "update/<str:username>/", UpdateProfileAPIView.as_view(), name="update_profile"
+    # ),
+    path(
+        "store_owners/all/",
+        StoreOwnersListAPIView.as_view(),
+        name="store_owners_profile",
+    ),
 ]

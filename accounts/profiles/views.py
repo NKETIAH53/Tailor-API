@@ -1,77 +1,90 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import BasePermission, IsAuthenticated
 
 from .exceptions import NotYourProfile, ProfileNotFound
-from .models import Profile
+from .models import StoreOwnerProfile, ClientProfile
 from .renderers import ProfileJSONRenderer
-from .serializers import ProfileSerializer, UpdateProfileSerializer
+from .serializers import (
+    StoreOwnerProfileSerializer,
+    ClientProfileSerializer,
+    StoreOwnerUpdateProfileSerializer,
+)
+from accounts.users.models import StoreOwner
+from django.conf import settings
+
+User = settings.AUTH_USER_MODEL
 
 
-# class StoreAccessUserMeasurementPermissions(BasePermission):
-#     '''
-#     Make user measurements available only to store in which order is placed.
-#     '''
-#     message = 'Store from which orders have been made can see user measurements '
+class ProfileAccessUpdatePermission(BasePermission):
+    message = "Users can update only their profiles."
 
-#     def has_obj_permission(self, request, view, obj):
-#         if request.method == SAFE_METHODS.GET:
-#             return True
-#         return obj. == request.user
+    def has_object_permission(self, request, view, obj):
+        if request.method in ["PUT"] and obj.user == request.user:
+            return True
 
 
 class StoreOwnersListAPIView(generics.ListAPIView):
-    '''
+    """
     Authenticated users can see profiles of store owners
-    '''
-    queryset = Profile.objects.filter(store_owner=True)
-    serializer_class = ProfileSerializer
+    """
+
+    queryset = StoreOwnerProfile.objects.all()
+    serializer_class = StoreOwnerProfileSerializer
     permission_classes = [IsAuthenticated]
 
 
+class RetrieveUpdateProfileAPIView(APIView):
 
-class GetProfileAPIView(APIView):
-    '''
-    Authenticated user can only see own profile
-    '''
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ProfileAccessUpdatePermission]
     renderer_classes = [ProfileJSONRenderer]
 
     def get(self, request):
         user = self.request.user
-        user_profile = Profile.objects.get(user=user)
-        serializer = ProfileSerializer(user_profile, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if user.role == "CLIENT":
+            user_profile = ClientProfile.objects.get(user=user)
+            serializer = ClientProfileSerializer(
+                user_profile, context={"request": request}
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # def post(): #creating a new user profile
+        elif user.role == "STORE_OWNER":
+            user_profile = StoreOwnerProfile.objects.get(user=user)
+            serializer = StoreOwnerProfileSerializer(
+                user_profile, context={"request": request}
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request):
+        """
+        Currently works for only StoreOwner
+        """
 
-class UpdateProfileAPIView(APIView):
-    '''
-    Authenticated user can only update own profile
-    '''
-    permission_classes = [IsAuthenticated]
-    renderer_classes = [ProfileJSONRenderer]
-    serializer_class = UpdateProfileSerializer
-
-    def put(self, request, username):
+        user = self.request.user
+        # print(dir(user))
         try:
-            Profile.objects.get(user__username=username)
-        except Profile.DoesNotExist:
+            # if user.role == 'CLIENT':
+            #     print('ygunun')
+            #     ClientProfile.objects.get()
+
+            if user.role == "STORE_OWNER":
+                StoreOwnerProfile.objects.get()
+
+        except ClientProfile.DoesNotExist:
             raise ProfileNotFound
 
-        user_name = request.user.username
-        if user_name != username:
+        user_name = user.username
+        if not user_name:
             raise NotYourProfile
 
+        print("------------------")
         data = request.data
-        serializer = UpdateProfileSerializer(
-            instance=request.user.profile, data=data, partial=True
+        serializer = StoreOwnerUpdateProfileSerializer(
+            instance=request.user.storeownerprofile, data=data, partial=True
         )
+        print(serializer)
 
         serializer.is_valid()
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
