@@ -1,34 +1,86 @@
 from django.db import models
 from django.conf import settings
 from store_api.models import Design, Branch
+import uuid
 
 User = settings.AUTH_USER_MODEL
 
 
-"""
-1 user has many orders
-1 order belongs to one user
-1 order has only one design
-
-"""
-
-
 class Order(models.Model):
-    """
-    specify  validators such that only clients can create orders and not store_owners (TO DO).
-    """
+
+    FABRIC_SOURCE_OPTIONS = (
+        ('from_store', 'Store'),
+        ('from_me', 'Personal')
+    )
+
+    ORDER_STATUS_CHOICES = (
+        ('Received', 'Order Received',),
+        ('Processing', 'Processing',),
+        ('Completed', 'Completed',),
+        ('Delivered', 'Delivered',),
+        ('Cancelled', 'Cancelled',),
+    )
+
+    PAYMENT_STATUS_CHOICES = (
+        ('Not Paid', 'Unpaid'),
+        ('Part Payment', 'Part'),
+        ('Full Payment', 'Processing'),
+    )
 
     client = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
     )
-    design = models.ForeignKey(
-        Design, on_delete=models.SET_NULL, null=True, related_name="order_designs"
+    order_number = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True
+    )
+    design = models.ManyToManyField(
+        Design,
+        related_name="order_designs"
+    )
+    quantity = models.DecimalField(
+        max_digits=6,
+        decimal_places=0,
+        default=1
+    )
+    fabric_source = models.CharField(
+        max_length=10,
+        choices=FABRIC_SOURCE_OPTIONS,
+        default='from_me'
     )
     store_branch = models.ForeignKey(
-        Branch, on_delete=models.SET_NULL, null=True, related_name="store_orders"
+        Branch,
+        on_delete=models.DO_NOTHING,
+    )
+    order_status = models.CharField(
+        max_length=50,
+        choices=ORDER_STATUS_CHOICES,
+        default='Received'
+    )
+    payment_status = models.CharField(
+        max_length=100,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='Not Paid'
+    )
+    total_cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00
     )
 
-    def __str__(self):
-        return f"{self.store_branch.store.store_name}'s order"
+
+class OrderPayment(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE
+    )
+    amount = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=0.00
+    )
+    paid_on = models.DateTimeField(
+        auto_now_add=True
+    )

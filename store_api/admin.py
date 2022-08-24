@@ -3,7 +3,7 @@ from .models import Store, Branch, Design, Media
 
 
 class DesignAdmin(admin.ModelAdmin):
-    list_display = ("id", "style", "description", "cost")
+    list_display = ("id", "store_branch", "style", "description", "price_with_store_fabric", 'price_without_store_fabric')
 
 
 admin.site.register(Design, DesignAdmin)

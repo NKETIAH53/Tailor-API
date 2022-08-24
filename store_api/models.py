@@ -1,9 +1,16 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db.models import Q
+# from accounts.users.models import StoreOwner
 
 
 User = settings.AUTH_USER_MODEL
+
+
+def media_uploads(instance, filename):
+    return f"store_designs/{instance.design.store_branch.branch_name}/{instance.design.style}/{filename}"
 
 
 class Store(models.Model):
@@ -11,27 +18,72 @@ class Store(models.Model):
         def get_queryset(self):
             return super().get_queryset().filter(status="accepted")
 
-    options = (("pending", "P"), ("accepted", "A"))
+    OPTIONS = (
+        ("pending", "P"), 
+        ("accepted", "A"),
+    )
+
+    PAYMENT_POLICY_TYPES=(
+        ('full_payment_before_processing', 'FPBP'), ('part_payment_before_processing', 'PPBP'),
+    )
 
     store_owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="stores"
+        User, 
+        on_delete=models.CASCADE, 
+        related_name="stores"
     )
-    store_name = models.CharField(max_length=150, null=False, blank=False)
-    email = models.EmailField(max_length=254)
-    about = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=15, choices=options, default="pending")
+    store_name = models.CharField(
+        max_length=150, 
+        null=False, 
+        blank=False
+    )
+    email = models.EmailField(
+        max_length=254
+    )
+    about = models.TextField(
+        blank=True, 
+        null=True
+    )
+    policy_type = models.CharField(
+        max_length=50, 
+        choices=PAYMENT_POLICY_TYPES, default='pay_part_before_processing'
+    )
+    part_payment_percentage = models.DecimalField(
+        max_digits=3, 
+        decimal_places=1,
+        blank=True, 
+        null=True, 
+        # validators=[validate_payment_policy]
+    )
+    status = models.CharField(
+        max_length=15, 
+        choices=OPTIONS, 
+        default="pending"
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="store creation date",
         editable=False,
     )
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="store last updated")
+    updated_at = models.DateTimeField(
+        auto_now=True, 
+        verbose_name="store last updated"
+    )
 
     objects = models.Manager()
     storeobjects = StoreObjects()
 
+
     class Meta:
         ordering = ("-created_at",)
+        constraints = [
+            models.CheckConstraint(
+                check=(Q(
+                    part_payment_percentage__lte=0.8
+                )), 
+                name='Part payment percentage should be less than or equal 0.8'
+            ),
+        ]
 
     def __str__(self):
         return self.store_name
@@ -45,9 +97,15 @@ class Branch(models.Model):
         max_length=200, blank=False, null=False, verbose_name="branch name"
     )
     location = models.TextField()
-    street_name = models.CharField(max_length=150, verbose_name="branch street name")
+    street_name = models.CharField(
+        max_length=150, 
+        verbose_name="branch street name"
+    )
     digital_address = models.CharField(
-        max_length=15, null=False, blank=False, verbose_name="branch digital address"
+        max_length=15, 
+        null=False, 
+        blank=False, 
+        verbose_name="branch digital address"
     )
 
     def __str__(self):
@@ -57,7 +115,7 @@ class Branch(models.Model):
 class Design(models.Model):
 
     store_branch = models.ForeignKey(
-        Branch, on_delete=models.CASCADE, related_name="branch_design_details"
+        Branch, on_delete=models.CASCADE, related_name="branch_designs"
     )
     style = models.CharField(
         max_length=255,
@@ -65,21 +123,32 @@ class Design(models.Model):
         verbose_name=_("design style"),
     )
     description = models.TextField(
-        blank=True, null=True, verbose_name=_("style description")
+        blank=True, 
+        null=True, 
+        verbose_name=_("style description")
     )
-    cost = models.DecimalField(max_digits=10, decimal_places=2, default=299.99)
+    fabric_available = models.BooleanField(
+        default=False
+    )
+    price_with_store_fabric = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2
+    )
+    price_without_store_fabric = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        null=False
+    )
 
     def __str__(self):
         return self.style
 
 
-def media_uploads(instance, filename):
-    return f"store_designs/{instance.user.id}/{filename}"
-
-
 class Media(models.Model):
     design = models.ForeignKey(
-        Design, on_delete=models.CASCADE, related_name="design_images"
+        Design, 
+        on_delete=models.CASCADE, 
+        related_name="design_images"
     )
     image = models.ImageField(
         unique=False,
