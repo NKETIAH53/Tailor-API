@@ -1,17 +1,8 @@
-from rest_framework import generics
-from rest_framework.permissions import BasePermission, IsAuthenticated
-from .models import Order
-from .serializers import ClientOrderSerializer, StoreOrderSerializer
-from store_api.models import Store
-from django.core.exceptions import ValidationError
-
-
-class ClientOrderReadPermissions(BasePermission):
-    message = "Users can only see and delete their own orders."
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in ["GET", "DELETE"] and obj.client == request.user:
-            return True
+from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticated
+from .permissions import ClientOrderReadDeletePermissions, PaymentCreatePermission
+from .models import Order, OrderPayment
+from .serializers import ClientOrderSerializer, StoreOrderSerializer, OrderPaymentSerializer
 
 
 class ClientOrderList(generics.ListCreateAPIView):
@@ -24,17 +15,13 @@ class ClientOrderList(generics.ListCreateAPIView):
         queryset = Order.objects.filter(client=user)
         return queryset
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        if user.role != "CLIENT":
-            raise ValidationError("Only clients can create an order.")
-
-        serializer.save(client=self.request.user)
+    # def get_serializer_context(self):
+    #     return {'user': self.request.user}
 
 
 class ClientOrderDetail(generics.RetrieveDestroyAPIView):
 
-    permission_classes = [IsAuthenticated, ClientOrderReadPermissions]
+    permission_classes = [IsAuthenticated, ClientOrderReadDeletePermissions]
     queryset = Order.objects.all()
     serializer_class = ClientOrderSerializer
 
@@ -43,11 +30,9 @@ class StoreOrderList(generics.ListAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = StoreOrderSerializer
-    # queryset = Order.objects.filter(store_branch__id)
 
     def get_queryset(self):
         print("------------------------")
-        # store = Store.storeobjects.get(store_owner=self.request.user)
         orders = Order.objects.filter(
             store_branch__store__store_owner=self.request.user
         )
@@ -61,3 +46,17 @@ class StoreOrderDetail(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StoreOrderSerializer
     queryset = Order.objects.all()
+
+
+class OrderPaymentAPIView(generics.ListCreateAPIView):
+    serializer_class = OrderPaymentSerializer
+    permission_classes = [IsAuthenticated]
+    # queryset = OrderPayment.objects.all()
+
+    def get_serializer_context(self):
+        return {'user': self.request.user}
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = OrderPayment.objects.filter(order_id=user.pk)
+        return queryset

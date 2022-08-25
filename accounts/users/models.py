@@ -25,6 +25,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
         STORE_OWNER = "STORE_OWNER", _("Owner")
         CLIENT = "CLIENT", _("Client")
+        
 
     base_role = Role.STORE_OWNER
 
@@ -37,6 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=20, choices=Role.choices)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    # is_admin = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = "email"
@@ -55,10 +57,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username
 
-    # def save(self, *args, **kwargs):
-    #     if not self.pkid:
-    #         self.base_role = self.role
-    # return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.username
