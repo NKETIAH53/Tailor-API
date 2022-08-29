@@ -3,8 +3,6 @@ from .models import Store
 
 
 class StoreFilter(filters.FilterSet):
-   
     class Meta:
         model = Store
-        fields = ['store_name', 'store_branch']
-
+        fields = ["store_name", "store_branch"]

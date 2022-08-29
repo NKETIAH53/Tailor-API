@@ -5,6 +5,7 @@ from rest_framework.documentation import include_docs_urls
 from django.contrib import admin
 from django.urls import path, include
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/stores/", include("store_api.urls", namespace="store_api")),
@@ -27,6 +28,6 @@ urlpatterns = [
 
 
 # EXTRA ADMIN CONFIGURATION
-admin.site.site_header = "Store Admin"
-admin.site.site_title = "Store Admin Portal"
-admin.site.index_title = "Welcome to the Store Portal"
+admin.site.site_header = "Tailor Admin"
+admin.site.site_title = "Tailor Admin Portal"
+admin.site.index_title = "Welcome to the Tailor Portal"

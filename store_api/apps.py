@@ -7,4 +7,3 @@ class StoreApiConfig(AppConfig):
 
     def ready(self):
         import store_api.signals
-        
