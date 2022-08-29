@@ -25,7 +25,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
         STORE_OWNER = "STORE_OWNER", _("Owner")
         CLIENT = "CLIENT", _("Client")
-        
 
     base_role = Role.STORE_OWNER
 
@@ -56,7 +55,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.username
-
 
     def __str__(self):
         return self.username

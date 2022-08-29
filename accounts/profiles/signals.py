@@ -2,10 +2,8 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from accounts.profiles.models import StoreOwnerProfile, ClientProfile
-
-
-# from main.settings import AUTH_USER_MODEL
 from django.contrib.auth import get_user_model
+
 
 AUTH_USER_MODEL = get_user_model()
 

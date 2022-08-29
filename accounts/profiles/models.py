@@ -1,3 +1,4 @@
+from ast import ClassDef
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -7,12 +8,16 @@ from django_countries.fields import CountryField
 
 User = get_user_model()
 
+
 def upload_profile_photo(instance, filename):
-    return f'profile/{instance.user.id}/{filename}'
+    return f"profile/{instance.user.id}/{filename}"
+
 
 class CommonProfileFields(CommonUserProfile):
 
-    gender_options = (("Male", "M"), ("Female", "F"))
+    MALE = "m"
+    FEMALE = "f"
+    GENDER_OPTIONS = ((MALE, "Male"), (FEMALE, "Female"))
 
     country = CountryField(
         verbose_name=_("Country"), default="GH", blank=False, null=False
@@ -38,7 +43,7 @@ class CommonProfileFields(CommonUserProfile):
         verbose_name=_("Profile Photo"), upload_to=upload_profile_photo
     )
     gender = models.CharField(
-        max_length=10, verbose_name="Gender", choices=gender_options
+        max_length=10, verbose_name="Gender", choices=GENDER_OPTIONS
     )
 
 
@@ -61,11 +66,7 @@ class ClientProfile(CommonProfileFields):
         null=True,
     )
     bust = models.DecimalField(
-        verbose_name="Bust area", 
-        max_digits=2, 
-        decimal_places=0, 
-        blank=True, 
-        null=True
+        verbose_name="Bust area", max_digits=2, decimal_places=0, blank=True, null=True
     )
     arm_length = models.DecimalField(
         verbose_name="Arm length short",
@@ -82,16 +83,10 @@ class ClientProfile(CommonProfileFields):
         null=True,
     )
     bicep = models.DecimalField(
-        verbose_name="Bicep", max_digits=2, 
-        decimal_places=0, 
-        blank=True, 
-        null=True
+        verbose_name="Bicep", max_digits=2, decimal_places=0, blank=True, null=True
     )
     wrist = models.DecimalField(
-        verbose_name="Wrist", max_digits=2, 
-        decimal_places=0, 
-        blank=True, 
-        null=True
+        verbose_name="Wrist", max_digits=2, decimal_places=0, blank=True, null=True
     )
     torso = models.DecimalField(
         verbose_name="Torso length",
@@ -101,16 +96,10 @@ class ClientProfile(CommonProfileFields):
         null=True,
     )
     waist = models.DecimalField(
-        verbose_name="Waist", max_digits=2, 
-        decimal_places=0, 
-        blank=True, 
-        null=True
+        verbose_name="Waist", max_digits=2, decimal_places=0, blank=True, null=True
     )
     hips = models.DecimalField(
-        verbose_name="hips", max_digits=2, 
-        decimal_places=0, 
-        blank=True, 
-        null=True
+        verbose_name="hips", max_digits=2, decimal_places=0, blank=True, null=True
     )
     waist_to_above_knee = models.DecimalField(
         verbose_name="Skirt/ Shorts length",
@@ -127,11 +116,7 @@ class ClientProfile(CommonProfileFields):
         null=True,
     )
     calf = models.DecimalField(
-        verbose_name="Calf", 
-        max_digits=2, 
-        decimal_places=0, 
-        blank=True, 
-        null=True
+        verbose_name="Calf", max_digits=2, decimal_places=0, blank=True, null=True
     )
 
     def __str__(self):

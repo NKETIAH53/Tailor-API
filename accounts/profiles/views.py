@@ -11,11 +11,10 @@ from .serializers import (
     ClientProfileSerializer,
     StoreOwnerUpdateProfileSerializer,
 )
-from accounts.users.models import StoreOwner
 from django.conf import settings
 
-User = settings.AUTH_USER_MODEL
 
+User = settings.AUTH_USER_MODEL
 
 class ProfileAccessUpdatePermission(BasePermission):
     message = "Users can update only their profiles."
@@ -35,7 +34,7 @@ class StoreOwnersListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class RetrieveUpdateProfileAPIView(APIView):
+class ProfileRetrieveUpdateView(APIView):
 
     permission_classes = [IsAuthenticated, ProfileAccessUpdatePermission]
     renderer_classes = [ProfileJSONRenderer]
@@ -60,31 +59,23 @@ class RetrieveUpdateProfileAPIView(APIView):
         """
         Currently works for only StoreOwner
         """
-
         user = self.request.user
-        # print(dir(user))
         try:
-            # if user.role == 'CLIENT':
-            #     print('ygunun')
-            #     ClientProfile.objects.get()
-
             if user.role == "STORE_OWNER":
-                StoreOwnerProfile.objects.get()
-
-        except ClientProfile.DoesNotExist:
+                StoreOwnerProfile.objects.get(user=user)
+            elif user.role == "CLIENT":
+                ClientProfile.objects.get(user=user)
+        except:
             raise ProfileNotFound
 
         user_name = user.username
         if not user_name:
             raise NotYourProfile
 
-        print("------------------")
         data = request.data
         serializer = StoreOwnerUpdateProfileSerializer(
             instance=request.user.storeownerprofile, data=data, partial=True
         )
-        print(serializer)
-
         serializer.is_valid()
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
