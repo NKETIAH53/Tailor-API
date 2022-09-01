@@ -12,6 +12,22 @@ class MediaSerializer(serializers.ModelSerializer):
         ]
 
 
+class BranchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Branch
+        fields = [
+            "id",
+            "store",
+            "branch_name",
+            "location",
+            "street_name",
+            "digital_address",
+        ]
+
+        # depth = 1
+
+
 class DesignSerializer(serializers.ModelSerializer):
     design_photos = MediaSerializer(many=True, source="design_images")
 
@@ -36,26 +52,6 @@ class DesignSerializer(serializers.ModelSerializer):
                     "price_with_store_fabric": "You cannot set a price if the fabric is not available"
                 }
             )
-
-
-class BranchSerializer(serializers.ModelSerializer):
-    store = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Branch
-        fields = [
-            "id",
-            "store",
-            "branch_name",
-            "location",
-            "street_name",
-            "digital_address",
-        ]
-
-        # depth = 1
-
-    def get_store(self, obj):
-        return obj.store.store_name
 
 
 class StoreSerializer(serializers.ModelSerializer):
@@ -101,3 +97,4 @@ class StoreDetailSerializer(serializers.ModelSerializer):
 
     def get_store_owner(self, obj):
         return obj.store_owner.username
+

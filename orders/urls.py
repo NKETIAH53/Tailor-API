@@ -7,6 +7,4 @@ app_name = "orders"
 router = DefaultRouter()
 router.register(r"", OrderViewSet, basename='orders')
 
-urlpatterns = [
-
-] + router.urls
+urlpatterns =  router.urls

@@ -9,11 +9,10 @@ from .serializers import OrderSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
 
-    permission_classes = [IsAuthenticated,      ClientOrderDeletePermissions]
+    permission_classes = [IsAuthenticated, ClientOrderDeletePermissions]
     serializer_class = OrderSerializer
     filter_backends = [filter.DjangoFilterBackend]
     filterset_class = OrderFilter
-    # queryset = Order.objects.all()
 
     def get_queryset(self):
         return Order.objects.filter(client=self.request.user)

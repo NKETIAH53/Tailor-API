@@ -7,7 +7,7 @@ class StoreOwnerWritePermissions(BasePermission):
 
     def has_permission(self, request, view):
         if request.method in ["POST", "PUT", "DELETE", "PATCH"]:
-            if request.user.role == "STORE_OWNER":
+            if request.user.role == "SO":
                 return True
 
         elif request.method == "GET":

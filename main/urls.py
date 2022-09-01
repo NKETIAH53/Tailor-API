@@ -15,15 +15,7 @@ urlpatterns = [
     path("api/auth/", include("djoser.urls.jwt")),
     path("docs/", include_docs_urls(title="TailorAPI")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    path(
-        "schema",
-        get_schema_view(
-            title="Tailor API Project",
-            description="API for all tailor app …",
-            version="1.0.0",
-        ),
-        name="tailorapi-schema",
-    ),
+    path("schema", get_schema_view(title="Tailor API Project", description="API for all tailor app …", version="1.0.0"), name="tailorapi-schema"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

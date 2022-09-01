@@ -7,8 +7,8 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-@shared_task(name="store_creation_notification_task")
-def store_creation_notification_task(instance, **kwargs):
+@shared_task(name="user_store_created_email_notification_task")
+def user_store_created_email_notification_task(instance, **kwargs):
     subject = "Thank you for adding a store."
     message = "Kindly contact admin on +233000000 for further details."
     from_email = settings.DEFAULT_FROM_EMAIL

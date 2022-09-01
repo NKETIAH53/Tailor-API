@@ -10,7 +10,7 @@ router.register(r"designs", DesignViewSet, basename="designs")
 
 # both branch and design endpoints have been specified on the store detail endpoint
 urlpatterns = [
-    path("", StoreList.as_view(), name="listcreate"),
-    path("<int:pk>/", StoreDetail.as_view(), name="detailcreate"),
+    path("", StoreList.as_view(), name="list_create"),
+    path("<int:pk>/", StoreDetail.as_view(), name="detail_destroy"),
     path("<int:pk>/", include(router.urls)),
 ]

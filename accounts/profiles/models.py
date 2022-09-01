@@ -15,8 +15,8 @@ def upload_profile_photo(instance, filename):
 
 class CommonProfileFields(CommonUserProfile):
 
-    MALE = "m"
-    FEMALE = "f"
+    MALE = "M"
+    FEMALE = "F"
     GENDER_OPTIONS = ((MALE, "Male"), (FEMALE, "Female"))
 
     country = CountryField(
