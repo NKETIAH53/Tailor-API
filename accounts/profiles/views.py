@@ -2,7 +2,6 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import BasePermission, IsAuthenticated
-
 from .exceptions import NotYourProfile, ProfileNotFound
 from .models import StoreOwnerProfile, ClientProfile
 from .renderers import ProfileJSONRenderer
@@ -41,14 +40,14 @@ class ProfileRetrieveUpdateView(APIView):
 
     def get(self, request):
         user = self.request.user
-        if user.role == "CLIENT":
+        if user.role == "CL":
             user_profile = ClientProfile.objects.get(user=user)
             serializer = ClientProfileSerializer(
                 user_profile, context={"request": request}
             )
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        elif user.role == "STORE_OWNER":
+        elif user.role == "SO":
             user_profile = StoreOwnerProfile.objects.get(user=user)
             serializer = StoreOwnerProfileSerializer(
                 user_profile, context={"request": request}
@@ -61,9 +60,9 @@ class ProfileRetrieveUpdateView(APIView):
         """
         user = self.request.user
         try:
-            if user.role == "STORE_OWNER":
+            if user.role == "SO":
                 StoreOwnerProfile.objects.get(user=user)
-            elif user.role == "CLIENT":
+            elif user.role == "CL":
                 ClientProfile.objects.get(user=user)
         except:
             raise ProfileNotFound

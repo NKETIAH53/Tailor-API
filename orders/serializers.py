@@ -80,7 +80,6 @@ class OrderSerializer(serializers.ModelSerializer):
         order_items = validated_data.pop("order_items")
         payment = validated_data.pop("payment")
 
-
         with transaction.atomic():
             order = Order.objects.create(**validated_data)
             print(order)

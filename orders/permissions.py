@@ -8,8 +8,8 @@ class ClientOrderDeletePermissions(BasePermission):
         user = request.user
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             return True
-
-        if user.role == "CLIENT" and request.method in ["POST", "DELETE"]:
+            
+        if user.role == "CL" and request.method in ["POST", "DELETE"]:
             return True
 
     def has_obj_permission(self, request, view, obj):

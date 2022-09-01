@@ -13,6 +13,6 @@ logger = logging.getLogger(__name__)
 @receiver(post_save, sender=AUTH_USER_MODEL)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        if instance.role == "STORE_OWNER":
+        if instance.role == "SO":
             return StoreOwnerProfile.objects.create(user=instance)
         return ClientProfile.objects.create(user=instance)
